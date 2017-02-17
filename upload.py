@@ -9,6 +9,7 @@ from oauth2client import client
 from oauth2client import tools
 from oauth2client.file import Storage
 from apiclient.http import MediaFileUpload
+from socket import error as SocketError
 
 # If modifying these scopes, delete your previously saved credentials
 # at ~/.credentials/drive-python-quickstart.json
@@ -78,4 +79,9 @@ def main(source, folder, wait=10):
 if __name__ == '__main__':
     source = sys.argv[1]
     folder = sys.argv[2]
-    main(source, folder)
+    while 1: 
+        try:
+            main(source, folder)
+        except SocketError as e:
+            print(e)
+            
