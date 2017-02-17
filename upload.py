@@ -15,7 +15,7 @@ from socket import error as SocketError
 # at ~/.credentials/drive-python-quickstart.json
 SCOPES = 'https://www.googleapis.com/auth/drive'
 CLIENT_SECRET_FILE = 'client_secret.json'
-APPLICATION_NAME = 'Drive API Python Quickstart'
+APPLICATION_NAME = 'FlexData Upload'
 
 def get_credentials():
     """Gets valid user credentials from storage.
