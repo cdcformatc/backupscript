@@ -52,7 +52,7 @@ def main(source, folder, wait=10):
     os.chdir(source)
     
     while True:
-        allfiles = sorted(glob.glob('*.txt.gz'))
+        allfiles = sorted(glob.glob('*.gz'))
         
         for f in allfiles[:-1]:
             x = time.time()

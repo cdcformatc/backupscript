@@ -8,7 +8,7 @@ from shutil import copyfile
 def main(source, dest, wait=10):
     while True:
         os.chdir(source) 
-        allfiles = sorted(glob.glob('*.txt.gz'))
+        allfiles = sorted(glob.glob('*.gz'))
         os.chdir('..') 
         
         for f in allfiles[:-1]:
