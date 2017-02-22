@@ -61,19 +61,21 @@ def main(source, folder, wait=10):
             file_metadata = { 
                 'name' : f, 
                 'parents': [folder] }
-            media = MediaFileUpload(f, mimetype='application/gzip')
-            file = service.files().create(body=file_metadata,
-                                    media_body=media,
-                                    fields='id').execute()
-                                    
-            print(file['id'])
-            print(time.time()-x)
+            try:
+                media = MediaFileUpload(f, mimetype='application/gzip')
+                file = service.files().create(body=file_metadata,
+                    media_body=media,
+                    fields='id').execute()
+            except SocketError as e:
+                print(e)
+            else:
+                print(file['id'])
+                print(time.time()-x)
+                media = None
+                file = None
+                time.sleep(2)
+                os.remove(f)
             
-            media = None
-            file = None
-            
-            time.sleep(1)
-            os.remove(f)
         time.sleep(wait)
 
 if __name__ == '__main__':
@@ -82,6 +84,6 @@ if __name__ == '__main__':
     while 1: 
         try:
             main(source, folder)
-        except SocketError as e:
+        except Exception as e:
             print(e)
             
