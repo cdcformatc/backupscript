@@ -55,13 +55,13 @@ def delete_file(service, file_id):
     file_id: ID of the file to delete.
     """
     
-    print('Delete file {}'.format(file_id))
+    print('Delete file {}.'.format(file_id))
     
     # Potentially raises errors.HttpError (eg:403, 404)
     # Nothing to do about http errors 
     
     service.files().delete(fileId=file_id).execute()
-    print('File Deleted')
+    print('File Deleted.')
 
 def download_file(service, id, localpath):
     print(localpath)
@@ -73,7 +73,7 @@ def download_file(service, id, localpath):
         status, done = downloader.next_chunk()
         print("Download %d%%." % int(status.progress() * 100))
         
-def main(dest, folder, wait=10, download=True, delete=True):
+def main(dest, folder, limit=0, wait=10, download=True, delete=True):
     # Log in, initialize service
     credentials = get_credentials()
     http = credentials.authorize(httplib2.Http())
@@ -82,10 +82,12 @@ def main(dest, folder, wait=10, download=True, delete=True):
     # Create path
     if not os.path.exists(dest):
         os.mkdir(dest)
-        
-    page_token = None
     
-    while True:
+    check_limit = (limit != 0)
+    
+    page_token = None
+    complete = False
+    while not complete:
         # Get files in current page
         response = service.files().list(
             q="'{}' in parents".format(folder),
@@ -96,7 +98,7 @@ def main(dest, folder, wait=10, download=True, delete=True):
         files = response.get('files', [])
         if len(files) == 0:
             print('No files found in {}.'.format(folder))
-            break
+            complete = True
         
         for file in files:
             name = file.get('name')
@@ -109,6 +111,13 @@ def main(dest, folder, wait=10, download=True, delete=True):
                 
             if delete:
                 delete_file(service, id)
+                
+            if check_limit:
+                limit -= 1
+                print('{} files left.'.format(limit))
+                if limit <= 0:
+                    complete = True
+                    break
         else:
             print("Finished page.")
             
@@ -116,10 +125,12 @@ def main(dest, folder, wait=10, download=True, delete=True):
         page_token = response.get('nextPageToken', None)
         if page_token is None:
             print('Failed to get next page.')
-            break
-        
+            complete = True
 
+    print('Download complete.')
+    
 if __name__ == '__main__':
     dest = sys.argv[1]
     folder = sys.argv[2]
-    main(dest,folder,download=True,delete=True)
+    n=int(sys.argv[3])
+    main(dest,folder,limit=n,download=True,delete=True)
