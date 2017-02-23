@@ -90,6 +90,7 @@ def main(dest, folder, wait=10, download=True, delete=True):
         response = service.files().list(
             q="'{}' in parents".format(folder),
             fields='nextPageToken, files(id, name)',
+            orderBy='modifiedTime',
             pageToken=page_token).execute()
             
         files = response.get('files', [])
