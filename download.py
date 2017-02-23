@@ -34,7 +34,6 @@ def get_credentials():
         os.makedirs(credential_dir)
     credential_path = os.path.join(credential_dir,
                                    'drive-python-quickstart.json')
-
     store = Storage(credential_path)
     credentials = store.get()
     if not credentials or credentials.invalid:
@@ -59,9 +58,12 @@ def delete_file(service, file_id):
     
     # Potentially raises errors.HttpError (eg:403, 404)
     # Nothing to do about http errors 
-    
-    service.files().delete(fileId=file_id).execute()
-    print('File Deleted.')
+    try:
+        service.files().delete(fileId=file_id).execute()
+    except errors.HttpError as e:
+        print('HTTP Error: ' + e)
+    else:
+        print('File Deleted.')
 
 def download_file(service, id, localpath):
     print(localpath)
@@ -81,7 +83,7 @@ def main(dest, folder, limit=0, wait=10, download=True, delete=True):
     
     # Create path
     if not os.path.exists(dest):
-        os.mkdir(dest)
+        os.makedirs(dest)
     
     check_limit = (limit != 0)
     
@@ -99,7 +101,8 @@ def main(dest, folder, limit=0, wait=10, download=True, delete=True):
         if len(files) == 0:
             print('No files found in {}.'.format(folder))
             complete = True
-        
+            break
+            
         for file in files:
             name = file.get('name')
             id = file.get('id')
@@ -126,7 +129,7 @@ def main(dest, folder, limit=0, wait=10, download=True, delete=True):
         if page_token is None:
             print('Failed to get next page.')
             complete = True
-
+            
     print('Download complete.')
     
 if __name__ == '__main__':
